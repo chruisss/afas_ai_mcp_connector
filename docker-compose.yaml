@@ -1,0 +1,42 @@
+# afas-mcp-server with AFAS OAuth 2.0. docs/tutorials/getting-started.md and
+# docs/how-to/deploy-with-docker-compose.md walk through it.
+#
+# The server listens on port 8000 inside the container and publishes nothing on the host: put a
+# reverse proxy with TLS in front and use its https URL as AFAS_PUBLIC_URL.
+
+services:
+  afas-mcp:
+    build: .
+    restart: unless-stopped
+    environment:
+      # The number in your AFAS Online URL, and production, test or accept.
+      AFAS_MEMBER_ID: ${AFAS_MEMBER_ID:?set AFAS_MEMBER_ID}
+      AFAS_ENVIRONMENT: ${AFAS_ENVIRONMENT:-production}
+      # The OAuth app connector in AFAS (confidential client, authorization code flow).
+      AFAS_OAUTH_CLIENT_ID: ${AFAS_OAUTH_CLIENT_ID:?set AFAS_OAUTH_CLIENT_ID}
+      AFAS_OAUTH_CLIENT_SECRET: ${AFAS_OAUTH_CLIENT_SECRET:?set AFAS_OAUTH_CLIENT_SECRET}
+      # The public https URL of this service, without a trailing slash.
+      AFAS_PUBLIC_URL: ${AFAS_PUBLIC_URL:?set AFAS_PUBLIC_URL}
+      # Encrypts the stored AFAS tokens. Generate once and keep it; changing it logs everyone out.
+      AFAS_ENCRYPTION_KEY: ${AFAS_ENCRYPTION_KEY:?set AFAS_ENCRYPTION_KEY}
+      AFAS_ALLOW_WRITES: ${AFAS_ALLOW_WRITES:-false}
+      AFAS_TIMEOUT_SECONDS: ${AFAS_TIMEOUT_SECONDS:-60}
+      AFAS_DEFAULT_TAKE: ${AFAS_DEFAULT_TAKE:-100}
+      AFAS_MAX_TAKE: ${AFAS_MAX_TAKE:-1000}
+      AFAS_LANGUAGE: ${AFAS_LANGUAGE:-nl-nl}
+      AFAS_LOG_LEVEL: ${AFAS_LOG_LEVEL:-INFO}
+    expose:
+      - "8000"
+    volumes:
+      # The SQLite file with registered MCP clients and the encrypted AFAS tokens.
+      - afas-mcp-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  afas-mcp-data:
