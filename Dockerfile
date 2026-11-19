@@ -14,7 +14,7 @@ COPY src ./src
 RUN uv sync --frozen --no-dev --no-editable
 
 # Runtime stage: Python, the virtualenv and nothing else.
-FROM python:3.13-slim-trixie
+FROM python:3.15-slim-trixie
 
 # Not root, and with a fixed uid so the owner of the data volume is predictable.
 RUN useradd --uid 10001 --create-home afas && mkdir /data && chown 10001:10001 /data
