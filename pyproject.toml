@@ -42,8 +42,8 @@ Documentation = "https://github.com/chruisss/afas_ai_mcp_connector/tree/main/doc
 dev = [
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
-    "ruff==0.15.22",
-    "ty==0.0.99",
+    "ruff==0.17.4",
+    "ty==0.0.101",
 ]
 
 [build-system]
